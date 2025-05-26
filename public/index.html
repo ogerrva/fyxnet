@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>VSPlus Dashboard</title>
   <style>
-    /* seu CSS de layout do menu aqui */
     :root {
-      --bg:#0f172a; --card:#1e293b; --accent:#10b981; --accent-light:#6ee7b7;
+      --bg:#0f172a; --card:#1e293b;
+      --accent:#10b981; --accent-light:#6ee7b7;
       --text:#f1f5f9; --footer-h:56px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
@@ -28,9 +28,8 @@
       gap:1.5rem;
     }
     .card {
-      background:var(--card);
-      border-radius:8px; padding:2rem;
-      text-align:center; transition:.2s;
+      background:var(--card); border-radius:8px;
+      padding:2rem; text-align:center; transition:.2s;
     }
     .card:hover { transform:translateY(-4px); }
     .btn {
@@ -63,12 +62,10 @@
       </div>
     </div>
   </div>
-
   <script>
-    document.querySelectorAll('.btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.querySelectorAll('.btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
         const url = encodeURIComponent(btn.dataset.url);
-        // abre no proxy, sem iframe
         window.location.href = `/proxy?url=${url}`;
       });
     });
