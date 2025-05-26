@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VSPlus Dashboard</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-hover: #374151;
+      --text: #f1f5f9;
+      --accent: #10b981;
+      --accent-light: #6ee7b7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    /* header */
+    header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: var(--card);
+    }
+    .header-button {
+      background: transparent;
+      border: 1px solid var(--accent-light);
+      color: var(--accent-light);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .header-button:hover {
+      background-color: rgba(16, 185, 129, 0.1);
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      margin-left: 1rem;
+      border-radius: 50%;
+      background-color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+
+    /* main grid */
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* card */
+    .card {
+      background-color: var(--card);
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      transition: background-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      background-color: var(--card-hover);
+      transform: translateY(-4px);
+    }
+    .card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--accent-light);
+    }
+    .card .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background-color: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .card .btn:hover {
+      background-color: var(--accent-light);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="header-button">+ Teste Rápido</button>
+    <div class="user-avatar">g</div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h2>Revendedor(a)</h2>
+        <a
+          class="btn"
+          href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668"
+          target="_blank"
+        >Seja um revendedor(a)</a>
+      </div>
+
+      <div class="card">
+        <h2>Teste Grátis</h2>
+        <a
+          class="btn"
+          href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668"
+          target="_blank"
+        >Crie seu teste grátis</a>
+      </div>
+
+      <div class="card">
+        <h2>Painel</h2>
+        <a
+          class="btn"
+          href="https://vsplus.atxhost.com.br/"
+          target="_blank"
+        >Acessar painel de revendedor(a)</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
