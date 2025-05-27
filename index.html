@@ -1,6 +1,4 @@
-<?php
-// index.php — Tela responsiva sem scroll e ajustável
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -14,23 +12,22 @@
       font-weight: normal;
       font-style: normal;
     }
-    /* Variáveis de escala e sizing */
     :root {
       --base-font-size: 16px;
       --scale: 1.5;
-      --profile-size: 4;   /* em rem */
+      --profile-size: 4;
       --gradient-from: #1f004a;
       --gradient-to: #09001c;
       --accent: #4ee7b7;
       --text-light: #e0ffff;
       --btn-bg-hover: rgba(78, 231, 183, 0.1);
     }
-    /* Aplica escala geral */
     html {
       font-size: calc(var(--base-font-size) * var(--scale));
       height: 100%;
       margin: 0;
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       height: 100vh;
       margin: 0;
@@ -50,7 +47,7 @@
       padding: 2rem 1rem;
       text-align: center;
       box-shadow: 0 1rem 3rem rgba(0,0,0,0.4);
-      overflow: hidden;
+      position: relative;
     }
     #profile-pic {
       width: calc(var(--profile-size) * 1rem);
@@ -102,18 +99,17 @@
     <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
     <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
     <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">Acessar painel de revendedor(a)</a>
-    <?php if (file_exists(__DIR__ . '/banner.png')): ?>
-      <div class="banner"><img src="banner.png" alt="Banner FYXNET"></div>
-    <?php endif; ?>
   </div>
   <script>
     Telegram.WebApp.ready();
     const user = Telegram.WebApp.initDataUnsafe.user || {};
+    // Foto de perfil
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
       pic.src = user.photo_url;
       pic.style.display = 'block';
     }
+    // Saudação em português
     const hour = new Date().getHours();
     let saudacao;
     if (hour < 12) saudacao = 'Bom dia';
@@ -121,6 +117,22 @@
     else saudacao = 'Boa noite';
     const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
     document.getElementById('greeting').innerText = `${saudacao}, ${nome}!`;
+
+    // Banner opcional via JS
+    fetch('banner.png', { method: 'HEAD' })
+      .then(res => {
+        if (res.ok) {
+          const bannerDiv = document.createElement('div');
+          bannerDiv.className = 'banner';
+          const img = document.createElement('img');
+          img.src = 'banner.png';
+          img.alt = 'Banner FYXNET';
+          bannerDiv.appendChild(img);
+          document.querySelector('.card').appendChild(bannerDiv);
+        }
+      }).catch(() => {
+        // se não existir, ignora
+      });
   </script>
 </body>
 </html>
