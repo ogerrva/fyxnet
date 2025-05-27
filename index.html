@@ -1,5 +1,5 @@
 <?php
-// index.php for Telegram WebApp
+// index.php for Telegram WebApp with profile photo
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,10 +11,9 @@
     :root {
       --bg: #0f172a;
       --card: #1e293b;
-      --card-hover: #374151;
-      --text: #f1f5f9;
       --accent: #10b981;
       --accent-light: #6ee7b7;
+      --text: #f1f5f9;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -31,8 +30,16 @@
       width: 100%; max-width: 320px;
       padding: 1rem;
     }
+    #profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      display: none;
+    }
     #greeting {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       font-size: 1.25rem;
     }
     .grid {
@@ -59,6 +66,7 @@
 </head>
 <body>
   <div class="container">
+    <img id="profile-pic" alt="Foto do usuário">
     <div id="greeting">Olá.</div>
     <div class="grid">
       <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
@@ -70,17 +78,22 @@
     // Inicializa o WebApp
     if (window.Telegram && Telegram.WebApp) {
       Telegram.WebApp.ready();
+      const user = Telegram.WebApp.initDataUnsafe.user || {};
+      // Saudação
+      const hour = new Date().getHours();
+      let saudacao = 'Olá';
+      if (hour < 12) saudacao = 'Bom dia';
+      else if (hour < 18) saudacao = 'Boa tarde';
+      else saudacao = 'Boa noite';
+      const firstName = user.first_name || '';
+      document.getElementById('greeting').innerText = `${saudacao}${firstName ? ', ' + firstName : ''}.`;
+      // Foto de perfil
+      if (user.photo_url) {
+        const img = document.getElementById('profile-pic');
+        img.src = user.photo_url;
+        img.style.display = 'block';
+      }
     }
-    // Obtém o primeiro nome ou usa um genérico
-    const user = Telegram.WebApp?.initDataUnsafe?.user;
-    const firstName = user?.first_name || '';
-    const now = new Date();
-    const hour = now.getHours();
-    let saudacao = 'Olá';
-    if (hour < 12) saudacao = 'Bom dia';
-    else if (hour < 18) saudacao = 'Boa tarde';
-    else saudacao = 'Boa noite';
-    document.getElementById('greeting').innerText = `${saudacao}${firstName ? ', ' + firstName : ''}.`;
   </script>
 </body>
 </html>
