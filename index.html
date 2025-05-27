@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FYXNET</title>
-  <script async src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --bg: #0f172a;
@@ -59,7 +59,7 @@
 </head>
 <body>
   <div class="container">
-    <div id="greeting">Olá visitante.</div>
+    <div id="greeting">Olá.</div>
     <div class="grid">
       <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
       <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
@@ -67,22 +67,20 @@
     </div>
   </div>
   <script>
-    (function() {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        const user = Telegram.WebApp.initDataUnsafe?.user || {};
-        const firstName = user.first_name || 'Usuário';
-        const hour = new Date().getHours();
-        let saudacao;
-        if (hour < 12) saudacao = 'Bom dia';
-        else if (hour < 18) saudacao = 'Boa tarde';
-        else saudacao = 'Boa noite';
-        document.getElementById('greeting').innerText = `${saudacao}, ${firstName}.`;
-      } else {
-        // não está em Telegram WebApp
-        document.getElementById('greeting').innerText = 'Abra esta página pelo seu bot no Telegram.';
-      }
-    })();
+    // Inicializa o WebApp
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.ready();
+    }
+    // Obtém o primeiro nome ou usa um genérico
+    const user = Telegram.WebApp?.initDataUnsafe?.user;
+    const firstName = user?.first_name || '';
+    const now = new Date();
+    const hour = now.getHours();
+    let saudacao = 'Olá';
+    if (hour < 12) saudacao = 'Bom dia';
+    else if (hour < 18) saudacao = 'Boa tarde';
+    else saudacao = 'Boa noite';
+    document.getElementById('greeting').innerText = `${saudacao}${firstName ? ', ' + firstName : ''}.`;
   </script>
 </body>
 </html>
