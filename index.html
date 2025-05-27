@@ -6,6 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FYXNET</title>
+  <script async src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
       --bg: #0f172a;
@@ -28,9 +29,9 @@
     .container {
       text-align: center;
     }
-    h1 {
-      margin-bottom: 2rem;
-      font-size: 2rem;
+    #greeting {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
     }
     .grid {
       display: flex;
@@ -69,7 +70,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>FYXNET</h1>
+    <div id="greeting">Carregando...</div>
     <div class="grid">
       <div class="card">
         <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">
@@ -88,5 +89,18 @@
       </div>
     </div>
   </div>
+  <script>
+    // Espera o Telegram WebApp estar disponível
+    window.Telegram.WebApp.ready();
+    const user = window.Telegram.WebApp.initDataUnsafe?.user;
+    const name = user?.first_name || 'Usuário';
+    const now = new Date();
+    const hour = now.getHours();
+    let saudacao = 'Olá';
+    if (hour < 12) saudacao = 'Bom dia';
+    else if (hour < 18) saudacao = 'Boa tarde';
+    else saudacao = 'Boa noite';
+    document.getElementById('greeting').innerText = `${saudacao} ${name}.`;
+  </script>
 </body>
 </html>
