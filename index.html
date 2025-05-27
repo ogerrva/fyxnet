@@ -1,99 +1,95 @@
 <?php
-// index.php for Telegram WebApp with profile photo
+// index.php
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FYXNET</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    @font-face {
+      font-family: 'Brunson';
+      src: url('Brunson Rough.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #10b981;
-      --accent-light: #6ee7b7;
-      --text: #f1f5f9;
+      --bg-light: #f5f5f5;
+      --card-bg: #ffffff;
+      --text-dark: #333333;
+      --accent: #4A90E2;
+      --accent-hover: #357ABD;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg-light);
+      font-family: 'Brunson', sans-serif;
+      color: var(--text-dark);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
     }
     .container {
-      text-align: center;
-      width: 100%; max-width: 320px;
+      width: 100%;
+      max-width: 360px;
       padding: 1rem;
+      text-align: center;
     }
-    #profile-pic {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 0 auto 1rem;
-      display: none;
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
     }
-    #greeting {
+    .card h1 {
       margin-bottom: 1.5rem;
-      font-size: 1.25rem;
-    }
-    .grid {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      font-size: 2rem;
+      color: var(--text-dark);
     }
     .btn {
       display: block;
       width: 100%;
+      margin: 0.5rem 0;
       padding: 0.75rem;
-      font-size: 1rem;
-      color: #fff;
       background-color: var(--accent);
+      color: #fff;
       text-decoration: none;
-      border-radius: 4px;
-      transition: background-color 0.2s;
-      text-align: center;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+      font-size: 1rem;
     }
     .btn:hover {
-      background-color: var(--accent-light);
+      background-color: var(--accent-hover);
+    }
+    .banner {
+      text-align: center;
+    }
+    .banner img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img id="profile-pic" alt="Foto do usuário">
-    <div id="greeting">Olá.</div>
-    <div class="grid">
-      <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
-      <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
-      <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">Acessar painel de revendedor(a)</a>
+    <div class="card">
+      <h1>FYXNET</h1>
+      <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">
+        Seja um revendedor(a)
+      </a>
+      <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">
+        Crie seu teste grátis
+      </a>
+      <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">
+        Acessar painel de revendedor(a)
+      </a>
+    </div>
+    <div class="banner">
+      <img src="banner.png" alt="Banner FYXNET">
     </div>
   </div>
-  <script>
-    // Inicializa o WebApp
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.ready();
-      const user = Telegram.WebApp.initDataUnsafe.user || {};
-      // Saudação
-      const hour = new Date().getHours();
-      let saudacao = 'Olá';
-      if (hour < 12) saudacao = 'Bom dia';
-      else if (hour < 18) saudacao = 'Boa tarde';
-      else saudacao = 'Boa noite';
-      const firstName = user.first_name || '';
-      document.getElementById('greeting').innerText = `${saudacao}${firstName ? ', ' + firstName : ''}.`;
-      // Foto de perfil
-      if (user.photo_url) {
-        const img = document.getElementById('profile-pic');
-        img.src = user.photo_url;
-        img.style.display = 'block';
-      }
-    }
-  </script>
 </body>
 </html>
