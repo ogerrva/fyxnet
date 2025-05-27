@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>VSPlus Dashboard</title>
+
   <style>
     :root {
       --bg:#0f172a; --card:#1e293b;
@@ -46,27 +47,32 @@
     <h1>VS PLUS NET</h1>
     <div class="grid">
       <div class="card">
-        <button class="btn" data-url="https://vsplus.atxhost.com.br/revenda.php?token=758031714668">
+        <button class="btn"
+          data-url="https://vsplus.atxhost.com.br/revenda.php?token=758031714668">
           Seja um revendedor(a)
         </button>
       </div>
       <div class="card">
-        <button class="btn" data-url="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668">
+        <button class="btn"
+          data-url="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668">
           Crie seu teste grátis
         </button>
       </div>
       <div class="card">
-        <button class="btn" data-url="https://vsplus.atxhost.com.br/">
+        <button class="btn"
+          data-url="https://vsplus.atxhost.com.br/">
           Acessar painel de revendedor(a)
         </button>
       </div>
     </div>
   </div>
+
   <script>
-    document.querySelectorAll('.btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // vai chamar nossa Function em /api/proxy
         const url = encodeURIComponent(btn.dataset.url);
-        window.location.href = `/proxy?url=${url}`;
+        window.location.href = `/api/proxy?url=${url}`;
       });
     });
   </script>
