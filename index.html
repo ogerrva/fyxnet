@@ -1,10 +1,10 @@
 <?php
-// index.php — Layout conforme à imagem, container responsivo
+// index.php — Tela responsiva sem scroll e ajustável
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>FYXNET</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -14,76 +14,79 @@
       font-weight: normal;
       font-style: normal;
     }
-    /* Variáveis globais */
+    /* Variáveis de escala e sizing */
     :root {
       --base-font-size: 16px;
-      --scale: 1.5;            /* controle de escala */
-      --profile-size: 5;       /* diâmetro do avatar em rem */
+      --scale: 1.5;
+      --profile-size: 4;   /* em rem */
       --gradient-from: #1f004a;
       --gradient-to: #09001c;
       --accent: #4ee7b7;
       --text-light: #e0ffff;
-      --btn-hover-bg: rgba(78,231,183,0.1);
+      --btn-bg-hover: rgba(78, 231, 183, 0.1);
     }
-    /* aplica escala */
-    html { font-size: calc(var(--base-font-size) * var(--scale)); }
-    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-    body, html {
+    /* Aplica escala geral */
+    html {
+      font-size: calc(var(--base-font-size) * var(--scale));
       height: 100%;
-      font-family: 'CustomFont', sans-serif;
-      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      margin: 0;
     }
     body {
+      height: 100vh;
+      margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      font-family: 'CustomFont', sans-serif;
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      color: var(--text-light);
+      overflow: hidden;
     }
     .card {
-      width: 100%;            /* ocupa 100% do container pai */
-      max-width: 22rem;       /* limite de largura (ex: 22rem = ~352px) */
+      width: 90vw;
+      max-width: 22rem;
       background: linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
       border-radius: 1rem;
-      padding: 3rem 2rem;
+      padding: 2rem 1rem;
       text-align: center;
-      color: var(--text-light);
-      box-shadow: 0 1.333rem 4rem rgba(0,0,0,0.4);
+      box-shadow: 0 1rem 3rem rgba(0,0,0,0.4);
+      overflow: hidden;
     }
     #profile-pic {
       width: calc(var(--profile-size) * 1rem);
       height: calc(var(--profile-size) * 1rem);
       border-radius: 50%;
-      border: 0.083rem solid var(--accent);
+      border: 0.1rem solid var(--accent);
       object-fit: cover;
-      margin: 0 auto 2rem;
+      margin: 0 auto 1rem;
       display: none;
     }
     #greeting {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
       text-transform: uppercase;
       letter-spacing: 0.05rem;
     }
     .btn {
       display: block;
       width: 100%;
-      padding: 1.2rem;
-      margin: 0.8rem 0;
+      padding: 1rem;
+      margin: 0.75rem 0;
       background: transparent;
       color: var(--text-light);
-      font-size: 1rem;
+      font-size: 0.9rem;
       text-transform: uppercase;
-      border: 0.083rem solid var(--accent);
+      border: 0.1rem solid var(--accent);
       border-radius: 0.5rem;
       text-decoration: none;
       transition: background-color 0.2s, color 0.2s;
     }
     .btn:hover {
-      background: var(--btn-hover-bg);
+      background: var(--btn-bg-hover);
       color: var(--accent);
     }
     .banner {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
     .banner img {
       width: 100%;
@@ -106,13 +109,11 @@
   <script>
     Telegram.WebApp.ready();
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    // Foto de perfil
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
       pic.src = user.photo_url;
       pic.style.display = 'block';
     }
-    // Saudação em português
     const hour = new Date().getHours();
     let saudacao;
     if (hour < 12) saudacao = 'Bom dia';
