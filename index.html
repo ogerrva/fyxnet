@@ -2,8 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>FYXNET</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
@@ -22,21 +21,21 @@
       --btn-bg-hover:  rgba(78,231,183,0.1);
     }
     html {
-      font-size: calc(var(--base-font-size) * var(--scale));
-      height: 100%; margin: 0;
+      font-size: calc(var(--base-font-size)*var(--scale));
+      height:100%; margin:0;
     }
     *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
     body {
       height:100vh; margin:0;
       display:flex; align-items:center; justify-content:center;
       font-family:'CustomFont',sans-serif;
-      background: linear-gradient(135deg,var(--gradient-from),var(--gradient-to));
-      color: var(--text-light);
-      overflow: hidden;
+      background:linear-gradient(135deg,var(--gradient-from),var(--gradient-to));
+      color:var(--text-light);
+      overflow:hidden;
     }
     .card {
-      width: 90vw; max-width:22rem;
-      background: linear-gradient(135deg,var(--gradient-to),var(--gradient-from));
+      width:90vw; max-width:22rem;
+      background:linear-gradient(135deg,var(--gradient-to),var(--gradient-from));
       border-radius:1rem;
       padding:2rem 1rem;
       text-align:center;
@@ -60,8 +59,7 @@
     }
     .btn {
       display:block;
-      width:100%;
-      padding:1rem;
+      width:100%; padding:1rem;
       margin:0.75rem 0;
       background:transparent;
       color:var(--text-light);
@@ -70,11 +68,11 @@
       border:0.1rem solid var(--accent);
       border-radius:0.5rem;
       text-decoration:none;
-      transition: background-color 0.2s, color 0.2s;
+      transition:background-color 0.2s,color 0.2s;
     }
     .btn:hover {
-      background: var(--btn-bg-hover);
-      color: var(--accent);
+      background:var(--btn-bg-hover);
+      color:var(--accent);
     }
     .banner {
       margin-top:1.5rem;
@@ -100,75 +98,74 @@
       </div>
     <?php endif; ?>
   </div>
-
   <script>
+    // Inicializa o WebApp
     Telegram.WebApp.ready();
-
-    // Saudação e perfil
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    if (user.photo_url) {
-      const pic = document.getElementById('profile-pic');
-      pic.src = user.photo_url;
-      pic.style.display = 'block';
-    }
-    const h = new Date().getHours();
-    const saud = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
-    const nome = user.first_name?.toUpperCase() || 'FYXNET';
+
+    // Saudação
+    const hour = new Date().getHours();
+    const saud = hour<12?'Bom dia':hour<18?'Boa tarde':'Boa noite';
+    const nome = (user.first_name||'FYXNET').toUpperCase();
     document.getElementById('greeting').innerText = `${saud}, ${nome}!`;
 
-    // Botões externos
-    document.getElementById('btn-revenda').onclick = () => {
-      window.open(
-        'https://vsplus.atxhost.com.br/revenda.php?token=758031714668',
-        '_blank'
-      );
-    };
-    document.getElementById('btn-painel').onclick = () => {
-      window.open(
-        'https://vsplus.atxhost.com.br/',
-        '_blank'
-      );
-    };
-    document.getElementById('btn-download').onclick = () => {
-      window.open(
-        'https://play.google.com/store/apps/details?id=vsplus.lite.app',
-        '_blank'
-      );
-    };
-
-    // Cria teste e envia dados ao bot via AllOrigins
-    document.getElementById('btn-teste').onclick = async () => {
-      const token = '758031714668';
-      const vsplusURL = `https://vsplus.atxhost.com.br/criarteste.php?token=${token}`;
-      const proxyURL  = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(vsplusURL);
-
-      let html;
-      try {
-        const r = await fetch(proxyURL);
-        html = await r.text();
-      } catch {
-        return alert('Erro ao criar teste, tente novamente.');
+    // Caching da foto de perfil usando localStorage
+    async function loadProfilePic() {
+      if (!user.photo_url || !user.id) return;
+      const key = `profilePic_${user.id}`;
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        try {
+          const obj = JSON.parse(stored);
+          if (obj.url === user.photo_url) {
+            setPic(obj.data);
+            return;
+          }
+        } catch{}
       }
+      // caso não tenha ou mudou: buscar e armazenar
+      try {
+        const resp = await fetch(user.photo_url);
+        const blob = await resp.blob();
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const dataUrl = reader.result;
+          localStorage.setItem(key, JSON.stringify({url:user.photo_url,data:dataUrl}));
+          setPic(dataUrl);
+        };
+        reader.readAsDataURL(blob);
+      } catch(e) {
+        console.error('Foto perfil falhou:',e);
+      }
+    }
+    function setPic(src) {
+      const img = document.getElementById('profile-pic');
+      img.src = src;
+      img.style.display = 'block';
+    }
+    loadProfilePic();
 
-      // Extrai linhas relevantes
-      const txt = new DOMParser()
-        .parseFromString(html,'text/html')
-        .body.innerText
-        .split('\n')
-        .map(l=>l.trim())
-        .filter(Boolean);
+    // Botões externos
+    document.getElementById('btn-revenda') .onclick = ()=>window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668','_blank');
+    document.getElementById('btn-painel') .onclick = ()=>window.open('https://vsplus.atxhost.com.br/','_blank');
+    document.getElementById('btn-download').onclick = ()=>window.open('https://play.google.com/store/apps/details?id=vsplus.lite.app','_blank');
 
-      const info = { token };
-      txt.forEach(line => {
+    // Criação de teste
+    document.getElementById('btn-teste').onclick = async ()=>{
+      const token = '758031714668';
+      const vsurl = `https://vsplus.atxhost.com.br/criado.php?token=${token}`;
+      const proxy = 'https://api.allorigins.win/raw?url='+encodeURIComponent(vsurl);
+      let html;
+      try { html = await (await fetch(proxy)).text(); }
+      catch { return alert('Erro ao criar teste.'); }
+
+      const txt = new DOMParser().parseFromString(html,'text/html')
+        .body.innerText.split('\n').map(l=>l.trim()).filter(Boolean);
+      const info = {token};
+      txt.forEach(line=>{
         ['Usuario','Senha','Validade','Limite','Loja de Apps','Link de Renovação']
-          .forEach(key => {
-            if (line.startsWith(key+':')) {
-              info[key] = line.split(':')[1].trim();
-            }
-          });
+          .forEach(k=>{ if(line.startsWith(k+':')) info[k]=line.split(':')[1].trim(); });
       });
-
-      // Envia ao bot e fecha o WebApp
       Telegram.WebApp.sendData(JSON.stringify(info));
     };
   </script>
