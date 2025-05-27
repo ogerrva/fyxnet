@@ -19,155 +19,154 @@
       --accent:        #4ee7b7;
       --text-light:    #e0ffff;
       --btn-bg-hover:  rgba(78,231,183,0.1);
+      --card-bg:       linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
     }
-    html {
-      font-size: calc(var(--base-font-size)*var(--scale));
-      height:100%; margin:0;
-    }
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    html { font-size: calc(var(--base-font-size) * var(--scale)); height:100%; margin:0; }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     body {
       height:100vh; margin:0;
       display:flex; align-items:center; justify-content:center;
       font-family:'CustomFont',sans-serif;
-      background:linear-gradient(135deg,var(--gradient-from),var(--gradient-to));
-      color:var(--text-light);
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      color: var(--text-light);
       overflow:hidden;
     }
     .card {
-      width:90vw; max-width:22rem;
-      background:linear-gradient(135deg,var(--gradient-to),var(--gradient-from));
-      border-radius:1rem;
-      padding:2rem 1rem;
-      text-align:center;
-      box-shadow:0 1rem 3rem rgba(0,0,0,0.4);
-      overflow:hidden;
+      width: 90vw; max-width: 22rem;
+      background: var(--card-bg);
+      border-radius: 1rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      box-shadow: 0 1rem 3rem rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
     }
     #profile-pic {
-      width:calc(var(--profile-size)*1rem);
-      height:calc(var(--profile-size)*1rem);
-      border-radius:50%;
-      border:0.1rem solid var(--accent);
-      object-fit:cover;
-      margin:0 auto 1rem;
-      display:none;
+      width: calc(var(--profile-size) * 1rem);
+      height: calc(var(--profile-size) * 1rem);
+      border-radius: 50%;
+      border: 0.1rem solid var(--accent);
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      display: none;
     }
     #greeting {
-      font-size:1rem;
-      margin-bottom:1.5rem;
-      text-transform:uppercase;
-      letter-spacing:0.05rem;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05rem;
     }
     .btn {
-      display:block;
-      width:100%; padding:1rem;
-      margin:0.75rem 0;
-      background:transparent;
-      color:var(--text-light);
-      font-size:0.9rem;
-      text-transform:uppercase;
-      border:0.1rem solid var(--accent);
-      border-radius:0.5rem;
-      text-decoration:none;
-      transition:background-color 0.2s,color 0.2s;
+      display: block;
+      width: 100%; padding: 1rem;
+      margin: 0.75rem 0;
+      background: transparent;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      border: 0.1rem solid var(--accent);
+      border-radius: 0.5rem;
+      text-decoration: none;
+      transition: background-color 0.2s, color 0.2s;
     }
-    .btn:hover {
-      background:var(--btn-bg-hover);
-      color:var(--accent);
+    .btn:hover { background: var(--btn-bg-hover); color: var(--accent); }
+    .banner { margin-top: 1.5rem; }
+    .banner img { width:100%; border-radius: 0.5rem; display: block; }
+    /* Bottom sheet for download */
+    #download-sheet {
+      position: fixed;
+      left: 0; bottom: -100%;
+      width: 100%; height: 50vh;
+      background: var(--card-bg);
+      border-radius: 1rem 1rem 0 0;
+      box-shadow: 0 -0.5rem 1.5rem rgba(0,0,0,0.4);
+      transition: bottom 0.3s ease;
+      display: flex; flex-direction: column;
+      align-items: center; padding: 1rem;
     }
-    .banner {
-      margin-top:1.5rem;
-    }
-    .banner img {
-      width:100%; border-radius:0.5rem; display:block;
-    }
+    #download-sheet .btn { width: 80%; }
   </style>
 </head>
 <body>
   <div class="card">
     <img id="profile-pic" src="" alt="Foto de perfil">
     <div id="greeting">Olá.</div>
-
     <a class="btn" id="btn-revenda">Seja um revendedor(a)</a>
     <a class="btn" id="btn-teste">Crie seu teste grátis</a>
     <a class="btn" id="btn-painel">Acessar painel de revendedor(a)</a>
     <a class="btn" id="btn-download">Download App</a>
-
     <?php if (file_exists(__DIR__ . '/banner.png')): ?>
-      <div class="banner">
-        <img src="banner.png" alt="Banner FYXNET">
-      </div>
+      <div class="banner"><img src="banner.png" alt="Banner FYXNET"></div>
     <?php endif; ?>
   </div>
-  <script>
-    // Inicializa o WebApp
-    Telegram.WebApp.ready();
-    const user = Telegram.WebApp.initDataUnsafe.user || {};
 
-    // Saudação
+  <!-- Bottom sheet -->
+  <div id="download-sheet">
+    <a class="btn" id="sheet-download">Baixar App</a>
+    <a class="btn" id="sheet-update">Atualizar App</a>
+    <a class="btn" id="sheet-close">Fechar</a>
+  </div>
+
+  <script>
+    Telegram.WebApp.ready();
+    const ua = navigator.userAgent;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+    const user = Telegram.WebApp.initDataUnsafe.user || {};
+    // perfil
+    if (user.photo_url) {
+      const pic = document.getElementById('profile-pic');
+      pic.src = user.photo_url; pic.style.display = 'block';
+    }
+    // saudação
     const hour = new Date().getHours();
-    const saud = hour<12?'Bom dia':hour<18?'Boa tarde':'Boa noite';
-    const nome = (user.first_name||'FYXNET').toUpperCase();
+    let saud;
+    if (hour < 12) saud = 'Bom dia';
+    else if (hour < 18) saud = 'Boa tarde';
+    else saud = 'Boa noite';
+    const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
     document.getElementById('greeting').innerText = `${saud}, ${nome}!`;
 
-    // Caching da foto de perfil usando localStorage
-    async function loadProfilePic() {
-      if (!user.photo_url || !user.id) return;
-      const key = `profilePic_${user.id}`;
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        try {
-          const obj = JSON.parse(stored);
-          if (obj.url === user.photo_url) {
-            setPic(obj.data);
-            return;
-          }
-        } catch{}
-      }
-      // caso não tenha ou mudou: buscar e armazenar
-      try {
-        const resp = await fetch(user.photo_url);
-        const blob = await resp.blob();
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const dataUrl = reader.result;
-          localStorage.setItem(key, JSON.stringify({url:user.photo_url,data:dataUrl}));
-          setPic(dataUrl);
-        };
-        reader.readAsDataURL(blob);
-      } catch(e) {
-        console.error('Foto perfil falhou:',e);
-      }
-    }
-    function setPic(src) {
-      const img = document.getElementById('profile-pic');
-      img.src = src;
-      img.style.display = 'block';
-    }
-    loadProfilePic();
+    // links
+    document.getElementById('btn-revenda').onclick = () => window.open(
+      'https://vsplus.atxhost.com.br/revenda.php?token=758031714668','_blank');
+    document.getElementById('btn-teste').onclick = () => window.open(
+      'https://vsplus.atxhost.com.br/criarteste.php?token=758031714668','_blank');
+    document.getElementById('btn-painel').onclick = () => window.open(
+      'https://vsplus.atxhost.com.br/','_blank');
 
-    // Botões externos
-    document.getElementById('btn-revenda') .onclick = ()=>window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668','_blank');
-    document.getElementById('btn-painel') .onclick = ()=>window.open('https://vsplus.atxhost.com.br/','_blank');
-    document.getElementById('btn-download').onclick = ()=>window.open('https://play.google.com/store/apps/details?id=vsplus.lite.app','_blank');
-
-    // Criação de teste
-    document.getElementById('btn-teste').onclick = async ()=>{
-      const token = '758031714668';
-      const vsurl = `https://vsplus.atxhost.com.br/criado.php?token=${token}`;
-      const proxy = 'https://api.allorigins.win/raw?url='+encodeURIComponent(vsurl);
-      let html;
-      try { html = await (await fetch(proxy)).text(); }
-      catch { return alert('Erro ao criar teste.'); }
-
-      const txt = new DOMParser().parseFromString(html,'text/html')
-        .body.innerText.split('\n').map(l=>l.trim()).filter(Boolean);
-      const info = {token};
-      txt.forEach(line=>{
-        ['Usuario','Senha','Validade','Limite','Loja de Apps','Link de Renovação']
-          .forEach(k=>{ if(line.startsWith(k+':')) info[k]=line.split(':')[1].trim(); });
+    // Download App long press & action
+    const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
+    const btnDownload = document.getElementById('btn-download');
+    let timer;
+    function showSheet() { document.getElementById('download-sheet').style.bottom = '0'; }
+    function hideSheet() { document.getElementById('download-sheet').style.bottom = '-100%'; }
+    function copyLink() {
+      navigator.clipboard.writeText(downloadLink).then(() => {
+        const msg = document.createElement('div');
+        msg.innerText = 'Link copiado!';
+        msg.style.color = 'var(--text-light)';
+        msg.style.marginTop = '0.5rem';
+        document.querySelector('.card').appendChild(msg);
+        setTimeout(() => msg.remove(), 2000);
       });
-      Telegram.WebApp.sendData(JSON.stringify(info));
-    };
+    }
+    btnDownload.addEventListener('mousedown', () => {
+      timer = setTimeout(copyLink, 700);
+    });
+    btnDownload.addEventListener('mouseup', () => clearTimeout(timer));
+    btnDownload.addEventListener('touchstart', () => {
+      timer = setTimeout(copyLink, 700);
+    });
+    btnDownload.addEventListener('touchend', () => clearTimeout(timer));
+    btnDownload.addEventListener('click', () => {
+      if (isMobile) showSheet();
+      else window.open(downloadLink, '_blank');
+    });
+
+    // sheet buttons
+    document.getElementById('sheet-download').onclick = () => window.open(downloadLink,'_blank');
+    document.getElementById('sheet-update').onclick   = () => window.open(downloadLink,'_blank');
+    document.getElementById('sheet-close').onclick    = hideSheet;
   </script>
 </body>
 </html>
