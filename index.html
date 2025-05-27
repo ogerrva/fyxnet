@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title>FYXNET</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <title>FYXNET</n><script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @font-face {
       font-family: 'CustomFont';
@@ -21,10 +20,7 @@
       --btn-bg-hover:  rgba(78,231,183,0.1);
       --card-bg:       linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
     }
-    html {
-      font-size: calc(var(--base-font-size) * var(--scale));
-      height:100%; margin:0;
-    }
+    html { font-size: calc(var(--base-font-size) * var(--scale)); height:100%; margin:0; }
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     body {
       height:100vh; margin:0;
@@ -41,6 +37,7 @@
       padding: 2rem 1rem;
       text-align: center;
       box-shadow: 0 1rem 3rem rgba(0,0,0,0.4);
+      position: relative;
       overflow: hidden;
     }
     #profile-pic {
@@ -74,38 +71,30 @@
     .btn:hover { background: var(--btn-bg-hover); color: var(--accent); }
     .banner { margin-top: 1.5rem; }
     .banner img { width:100%; border-radius: 0.5rem; display: block; }
-    /* Bottom sheet for download */
+
+    /* Bottom sheet with iframe */
     #download-sheet {
       position: fixed;
       left: 0; bottom: -100%;
-      width: 100%; height: auto;
-      max-height: 50vh;
+      width: 100%; height: 60vh;
       background: var(--card-bg);
       border-radius: 1rem 1rem 0 0;
       box-shadow: 0 -0.5rem 1.5rem rgba(0,0,0,0.4);
       transition: bottom 0.3s ease;
       display: flex; flex-direction: column;
-      align-items: center; padding: 0.5rem;
+      overflow: hidden;
     }
-    .sheet-handle {
+    #sheet-handle {
       width: 40px; height: 4px;
       background: rgba(0,0,0,0.2);
       border-radius: 2px;
-      margin: 0.5rem 0;
+      margin: 0.5rem auto;
       cursor: pointer;
     }
-    #download-sheet h2 {
-      margin: 0.5rem 0;
-      font-size: 1rem;
-      color: var(--text-light);
-    }
-    #download-sheet p {
-      margin: 0;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.7);
-    }
-    #download-sheet .btn {
-      width: 80%; margin: 0.5rem 0;
+    #sheet-iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
     }
   </style>
 </head>
@@ -122,21 +111,16 @@
     <?php endif; ?>
   </div>
 
-  <!-- Bottom sheet -->
+  <!-- Bottom sheet with embedded Play Store -->
   <div id="download-sheet">
-    <div class="sheet-handle" id="sheet-handle"></div>
-    <h2>VS Plus Net</h2>
-    <p>SSH T PROJECT</p>
-    <a class="btn" id="sheet-open">Abrir</a>
-    <a class="btn" id="sheet-close-btn">Fechar</a>
+    <div id="sheet-handle"></div>
+    <iframe id="sheet-iframe"></iframe>
   </div>
 
   <script>
     Telegram.WebApp.ready();
-    const ua = navigator.userAgent;
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    // foto
+    // perfil
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
       pic.src = user.photo_url; pic.style.display = 'block';
@@ -150,7 +134,7 @@
     const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
     document.getElementById('greeting').innerText = `${saud}, ${nome}!`;
 
-    // botões
+    // links
     document.getElementById('btn-revenda').onclick = () => window.open(
       'https://vsplus.atxhost.com.br/revenda.php?token=758031714668','_blank');
     document.getElementById('btn-teste').onclick = () => window.open(
@@ -158,22 +142,26 @@
     document.getElementById('btn-painel').onclick = () => window.open(
       'https://vsplus.atxhost.com.br/','_blank');
 
-    // download sheet logic
+    // bottom sheet logic
     const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
     const btnDownload = document.getElementById('btn-download');
     const sheet = document.getElementById('download-sheet');
     const sheetHandle = document.getElementById('sheet-handle');
-    const sheetOpen = document.getElementById('sheet-open');
-    const sheetCloseBtn = document.getElementById('sheet-close-btn');
-    function showSheet(){ sheet.style.bottom='0'; }
-    function hideSheet(){ sheet.style.bottom='-100%'; }
+    const sheetIframe = document.getElementById('sheet-iframe');
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    function showSheet() {
+      sheetIframe.src = downloadLink;
+      sheet.style.bottom = '0';
+    }
+    function hideSheet() {
+      sheet.style.bottom = '-100%';
+      sheetIframe.src = 'about:blank';
+    }
     btnDownload.onclick = () => {
-      if(isMobile) showSheet();
+      if (isMobile) showSheet();
       else window.open(downloadLink,'_blank');
     };
     sheetHandle.onclick = hideSheet;
-    sheetCloseBtn.onclick = hideSheet;
-    sheetOpen.onclick = () => window.open(downloadLink,'_blank');
   </script>
 </body>
 </html>
