@@ -1,5 +1,5 @@
 <?php
-// index.php — Layout conforme à imagem fornecida
+// index.php — Layout conforme à imagem com escala 3x e fonte custom
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,10 +9,14 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @font-face {
-      font-family: 'Brunson';
+      font-family: 'CustomFont';
       src: url('font.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
+    }
+    html {
+      /* triplica todas as rem */
+      font-size: 48px;
     }
     :root {
       --gradient-from: #1f004a;
@@ -24,49 +28,48 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     body, html {
       height:100%;
-      font-family: 'Brunson', sans-serif;
-      background: none;
+      font-family: 'CustomFont', sans-serif;
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
     }
     body {
       display:flex;
       align-items:center;
       justify-content:center;
-      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
     }
     .card {
-      width: 280px;
+      width: 17.5rem; /* 17.5 * 48px = 840px */
       background: linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
-      border-radius: 16px;
-      padding: 2rem 1.5rem;
+      border-radius: 1rem;
+      padding: 4rem 3rem; /* 4*48=192px, 3*48=144px */
       text-align: center;
       color: var(--text-light);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 1.333rem 4rem rgba(0,0,0,0.4);
     }
     #profile-pic {
-      width:80px;
-      height:80px;
-      border-radius:50%;
-      border: 2px solid var(--accent);
+      width: 5rem; /* 5*48=240px */
+      height: 5rem;
+      border-radius: 50%;
+      border: 0.083rem solid var(--accent); /* 0.083*48~4px */
       object-fit:cover;
-      margin: 0 auto 1rem;
+      margin: 0 auto 2rem;
     }
     #greeting {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.2rem; /*1.2*48=57.6px*/
+      margin-bottom: 2rem;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05rem;
     }
     .btn {
       display:block;
       width:100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
+      padding: 1.5rem; /*1.5*48=72px*/
+      margin: 1rem 0;
       background: transparent;
       color: var(--text-light);
-      font-size: 0.95rem;
+      font-size: 1rem; /*1*48=48px*/
       text-transform: uppercase;
-      border: 2px solid var(--accent);
-      border-radius: 8px;
+      border: 0.083rem solid var(--accent);
+      border-radius: 0.5rem;
       text-decoration: none;
       transition: background-color 0.2s, color 0.2s;
     }
@@ -85,23 +88,22 @@
     <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">Acessar painel de revendedor(a)</a>
   </div>
   <script>
-    // Inicializa WebApp Telegram
     Telegram.WebApp.ready();
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    // Foto
+    // perfil
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
       pic.src = user.photo_url;
       pic.style.display = 'block';
     }
-    // Saudação
+    // saudação em português
     const hour = new Date().getHours();
-    let saudacao = 'Olá';
-    if (hour < 12) saudacao = 'Good morning.';
-    else if (hour < 18) saudacao = 'Good afternoon.';
-    else saudacao = 'Good evening.';
-    const name = user.first_name ? user.first_name.toUpperCase() : '';
-    document.getElementById('greeting').innerText = `${saudacao} ${name}`;
+    let saudacao;
+    if (hour < 12) saudacao = 'Bom dia';
+    else if (hour < 18) saudacao = 'Boa tarde';
+    else saudacao = 'Boa noite';
+    const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
+    document.getElementById('greeting').innerText = `${saudacao}, ${nome}!`;
   </script>
 </body>
 </html>
