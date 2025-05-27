@@ -1,5 +1,5 @@
 <?php
-// index.php — Layout conforme à imagem, com banner opcional
+// index.php — Layout conforme à imagem, container responsivo
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,22 +14,20 @@
       font-weight: normal;
       font-style: normal;
     }
-    /* Variáveis de escala e sizing */
+    /* Variáveis globais */
     :root {
       --base-font-size: 16px;
-      --scale: 1.5;           /* Ajuste de escala geral */
-      --profile-size: 5;      /* Tamanho da foto em rem antes da escala */
+      --scale: 1.5;            /* controle de escala */
+      --profile-size: 5;       /* diâmetro do avatar em rem */
       --gradient-from: #1f004a;
       --gradient-to: #09001c;
       --accent: #4ee7b7;
       --text-light: #e0ffff;
-      --btn-bg-hover: rgba(78, 231, 183, 0.1);
+      --btn-hover-bg: rgba(78,231,183,0.1);
     }
-    /* Aplica escala geral */
-    html {
-      font-size: calc(var(--base-font-size) * var(--scale));
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* aplica escala */
+    html { font-size: calc(var(--base-font-size) * var(--scale)); }
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
     body, html {
       height: 100%;
       font-family: 'CustomFont', sans-serif;
@@ -42,14 +40,14 @@
       padding: 1rem;
     }
     .card {
-      width: 17.5rem;
+      width: 100%;            /* ocupa 100% do container pai */
+      max-width: 22rem;       /* limite de largura (ex: 22rem = ~352px) */
       background: linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
       border-radius: 1rem;
-      padding: 4rem 3rem;
+      padding: 3rem 2rem;
       text-align: center;
       color: var(--text-light);
       box-shadow: 0 1.333rem 4rem rgba(0,0,0,0.4);
-      position: relative;
     }
     #profile-pic {
       width: calc(var(--profile-size) * 1rem);
@@ -69,8 +67,8 @@
     .btn {
       display: block;
       width: 100%;
-      padding: 1.5rem;
-      margin: 1rem 0;
+      padding: 1.2rem;
+      margin: 0.8rem 0;
       background: transparent;
       color: var(--text-light);
       font-size: 1rem;
@@ -81,7 +79,7 @@
       transition: background-color 0.2s, color 0.2s;
     }
     .btn:hover {
-      background: var(--btn-bg-hover);
+      background: var(--btn-hover-bg);
       color: var(--accent);
     }
     .banner {
