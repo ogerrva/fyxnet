@@ -30,6 +30,9 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
     }
     body {
       height: 100vh;
@@ -152,14 +155,17 @@
       .catch(() => {});
 
     // Botões principais
-    document.getElementById('btn-revenda').onclick = () =>
+    document.getElementById('btn-revenda').addEventListener('click', () => {
       window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668', '_blank');
-    document.getElementById('btn-teste').onclick = () =>
+    });
+    document.getElementById('btn-teste').addEventListener('click', () => {
       window.open('https://vsplus.atxhost.com.br/criarteste.php?token=758031714668', '_blank');
-    document.getElementById('btn-painel').onclick = () =>
+    });
+    document.getElementById('btn-painel').addEventListener('click', () => {
       window.open('https://vsplus.atxhost.com.br/', '_blank');
+    });
 
-    // Download App: openLink + long-press copy
+    // Download App: openLink + long-press copy (works full button)
     const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
     const btnDownload = document.getElementById('btn-download');
     const alertEl = document.getElementById('copy-alert');
@@ -170,19 +176,15 @@
       setTimeout(() => alertEl.style.opacity = 0, 1500);
     }
 
-    btnDownload.addEventListener('mousedown', () => {
-      pressTimer = setTimeout(() => {
-        navigator.clipboard.writeText(downloadLink);
-        showCopyAlert();
-      }, 700);
-    });
-    btnDownload.addEventListener('touchstart', () => {
-      pressTimer = setTimeout(() => {
-        navigator.clipboard.writeText(downloadLink);
-        showCopyAlert();
-      }, 700);
-    });
-    ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt =>
+    ['mousedown','pointerdown','touchstart'].forEach(evt =>
+      btnDownload.addEventListener(evt, () => {
+        pressTimer = setTimeout(() => {
+          navigator.clipboard.writeText(downloadLink);
+          showCopyAlert();
+        }, 700);
+      })
+    );
+    ['mouseup','pointerup','mouseleave','touchend','touchcancel'].forEach(evt =>
       btnDownload.addEventListener(evt, () => clearTimeout(pressTimer))
     );
 
