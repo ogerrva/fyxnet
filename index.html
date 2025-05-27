@@ -1,5 +1,5 @@
 <?php
-// index.php
+// index.php for Telegram WebApp
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -28,28 +28,17 @@
     }
     .container {
       text-align: center;
+      width: 100%; max-width: 320px;
+      padding: 1rem;
     }
     #greeting {
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
       font-size: 1.25rem;
     }
     .grid {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      width: 100%;
-      max-width: 300px;
-      margin: 0 auto;
-    }
-    .card {
-      background-color: var(--card);
-      border-radius: 8px;
-      padding: 1rem;
-      transition: background-color 0.2s, transform 0.2s;
-    }
-    .card:hover {
-      background-color: var(--card-hover);
-      transform: translateY(-2px);
+      gap: 1rem;
     }
     .btn {
       display: block;
@@ -70,37 +59,30 @@
 </head>
 <body>
   <div class="container">
-    <div id="greeting">Carregando...</div>
+    <div id="greeting">Olá visitante.</div>
     <div class="grid">
-      <div class="card">
-        <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">
-          Seja um revendedor(a)
-        </a>
-      </div>
-      <div class="card">
-        <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">
-          Crie seu teste grátis
-        </a>
-      </div>
-      <div class="card">
-        <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">
-          Acessar painel de revendedor(a)
-        </a>
-      </div>
+      <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
+      <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
+      <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">Acessar painel de revendedor(a)</a>
     </div>
   </div>
   <script>
-    // Espera o Telegram WebApp estar disponível
-    window.Telegram.WebApp.ready();
-    const user = window.Telegram.WebApp.initDataUnsafe?.user;
-    const name = user?.first_name || 'Usuário';
-    const now = new Date();
-    const hour = now.getHours();
-    let saudacao = 'Olá';
-    if (hour < 12) saudacao = 'Bom dia';
-    else if (hour < 18) saudacao = 'Boa tarde';
-    else saudacao = 'Boa noite';
-    document.getElementById('greeting').innerText = `${saudacao} ${name}.`;
+    (function() {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        const user = Telegram.WebApp.initDataUnsafe?.user || {};
+        const firstName = user.first_name || 'Usuário';
+        const hour = new Date().getHours();
+        let saudacao;
+        if (hour < 12) saudacao = 'Bom dia';
+        else if (hour < 18) saudacao = 'Boa tarde';
+        else saudacao = 'Boa noite';
+        document.getElementById('greeting').innerText = `${saudacao}, ${firstName}.`;
+      } else {
+        // não está em Telegram WebApp
+        document.getElementById('greeting').innerText = 'Abra esta página pelo seu bot no Telegram.';
+      }
+    })();
   </script>
 </body>
 </html>
