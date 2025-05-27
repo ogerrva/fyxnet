@@ -21,18 +21,30 @@
       --btn-bg-hover:  rgba(78,231,183,0.1);
       --card-bg:       linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
     }
-    html { font-size: calc(var(--base-font-size) * var(--scale)); height:100%; margin:0; }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html {
+      font-size: calc(var(--base-font-size) * var(--scale));
+      height: 100%;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      height:100vh; margin:0;
-      display:flex; align-items:center; justify-content:center;
-      font-family:'CustomFont',sans-serif;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'CustomFont', sans-serif;
       background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
       color: var(--text-light);
-      overflow:hidden;
+      overflow: hidden;
     }
     .card {
-      width: 90vw; max-width: 22rem;
+      width: 90vw;
+      max-width: 22rem;
       background: var(--card-bg);
       border-radius: 1rem;
       padding: 2rem 1rem;
@@ -58,7 +70,8 @@
     }
     .btn {
       display: block;
-      width: 100%; padding: 1rem;
+      width: 100%;
+      padding: 1rem;
       margin: 0.75rem 0;
       background: transparent;
       color: var(--text-light);
@@ -68,10 +81,34 @@
       border-radius: 0.5rem;
       text-decoration: none;
       transition: background-color 0.2s, color 0.2s;
+      position: relative;
     }
-    .btn:hover { background: var(--btn-bg-hover); color: var(--accent); }
-    .banner { margin-top: 1.5rem; }
-    .banner img { width:100%; border-radius: 0.5rem; display: block; }
+    .btn:hover {
+      background: var(--btn-bg-hover);
+      color: var(--accent);
+    }
+    .copy-alert {
+      position: absolute;
+      bottom: -1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #ffffff;
+      background: rgba(0,0,0,0.6);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.3rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .banner {
+      margin-top: 1.5rem;
+    }
+    .banner img {
+      width: 100%;
+      border-radius: 0.5rem;
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -82,7 +119,10 @@
     <a class="btn" id="btn-revenda">Seja um revendedor(a)</a>
     <a class="btn" id="btn-teste">Crie seu teste grátis</a>
     <a class="btn" id="btn-painel">Acessar painel de revendedor(a)</a>
-    <a class="btn" id="btn-download">Download App</a>
+    <a class="btn" id="btn-download">
+      Download App
+      <div class="copy-alert" id="copy-alert">Link copiado!</div>
+    </a>
 
     <div class="banner" id="banner" style="display:none;">
       <img src="banner.png" alt="Banner FYXNET">
@@ -90,10 +130,9 @@
   </div>
 
   <script>
-    // Inicializa o Telegram WebApp
     Telegram.WebApp.ready();
 
-    // Perfil e saudação
+    // Saudação e perfil
     const user = Telegram.WebApp.initDataUnsafe.user || {};
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
@@ -101,7 +140,9 @@
       pic.style.display = 'block';
     }
     const hour = new Date().getHours();
-    const saudacao = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+    const saudacao = hour < 12 ? 'Bom dia'
+                    : hour < 18 ? 'Boa tarde'
+                    : 'Boa noite';
     const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
     document.getElementById('greeting').innerText = `${saudacao}, ${nome}!`;
 
@@ -111,24 +152,44 @@
       .catch(() => {});
 
     // Botões principais
-    document.getElementById('btn-revenda').addEventListener('click', () => {
+    document.getElementById('btn-revenda').onclick = () =>
       window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668', '_blank');
-    });
-    document.getElementById('btn-teste').addEventListener('click', () => {
+    document.getElementById('btn-teste').onclick = () =>
       window.open('https://vsplus.atxhost.com.br/criarteste.php?token=758031714668', '_blank');
-    });
-    document.getElementById('btn-painel').addEventListener('click', () => {
+    document.getElementById('btn-painel').onclick = () =>
       window.open('https://vsplus.atxhost.com.br/', '_blank');
-    });
 
-    // Download App: usar Telegram.WebApp.openLink
+    // Download App: openLink + long-press copy
     const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
-    document.getElementById('btn-download').addEventListener('click', () => {
-      if (Telegram.WebApp && Telegram.WebApp.openLink) {
-        Telegram.WebApp.openLink(downloadLink);
-      } else {
-        window.open(downloadLink, '_blank');
-      }
+    const btnDownload = document.getElementById('btn-download');
+    const alertEl = document.getElementById('copy-alert');
+    let pressTimer;
+
+    function showCopyAlert() {
+      alertEl.style.opacity = 1;
+      setTimeout(() => alertEl.style.opacity = 0, 1500);
+    }
+
+    btnDownload.addEventListener('mousedown', () => {
+      pressTimer = setTimeout(() => {
+        navigator.clipboard.writeText(downloadLink);
+        showCopyAlert();
+      }, 700);
+    });
+    btnDownload.addEventListener('touchstart', () => {
+      pressTimer = setTimeout(() => {
+        navigator.clipboard.writeText(downloadLink);
+        showCopyAlert();
+      }, 700);
+    });
+    ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt =>
+      btnDownload.addEventListener(evt, () => clearTimeout(pressTimer))
+    );
+
+    btnDownload.addEventListener('click', () => {
+      Telegram.WebApp.openLink
+        ? Telegram.WebApp.openLink(downloadLink)
+        : window.open(downloadLink, '_blank');
     });
   </script>
 </body>
