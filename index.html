@@ -1,5 +1,5 @@
 <?php
-// index.php — Layout conforme à imagem com escala 3x e fonte custom
+// index.php — Layout conforme à imagem com escala variável e fonte custom
 ?><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -14,59 +14,64 @@
       font-weight: normal;
       font-style: normal;
     }
-    html {
-      /* triplica todas as rem */
-      font-size: 48px;
-    }
+    /* Variáveis de escala e sizing */
     :root {
+      --base-font-size: 16px;
+      --scale: 1.5;           /* Ajuste de escala geral aqui */
+      --profile-size: 5;      /* Tamanho da foto em rem (antes de escalar) */
       --gradient-from: #1f004a;
       --gradient-to: #09001c;
       --accent: #4ee7b7;
       --text-light: #e0ffff;
       --btn-bg-hover: rgba(78, 231, 183, 0.1);
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
+    /* Aplica escala geral */
+    html {
+      font-size: calc(var(--base-font-size) * var(--scale));
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body, html {
-      height:100%;
+      height: 100%;
       font-family: 'CustomFont', sans-serif;
       background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
     }
     body {
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .card {
-      width: 17.5rem; /* 17.5 * 48px = 840px */
+      width: 17.5rem; /* ex: 17.5 * 1rem */
       background: linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
       border-radius: 1rem;
-      padding: 4rem 3rem; /* 4*48=192px, 3*48=144px */
+      padding: 4rem 3rem;
       text-align: center;
       color: var(--text-light);
       box-shadow: 0 1.333rem 4rem rgba(0,0,0,0.4);
     }
     #profile-pic {
-      width: 5rem; /* 5*48=240px */
-      height: 5rem;
+      width: calc(var(--profile-size) * 1rem);
+      height: calc(var(--profile-size) * 1rem);
       border-radius: 50%;
-      border: 0.083rem solid var(--accent); /* 0.083*48~4px */
-      object-fit:cover;
+      border: 0.083rem solid var(--accent);
+      object-fit: cover;
       margin: 0 auto 2rem;
+      display: none;
     }
     #greeting {
-      font-size: 1.2rem; /*1.2*48=57.6px*/
+      font-size: 1.2rem;
       margin-bottom: 2rem;
       text-transform: uppercase;
       letter-spacing: 0.05rem;
     }
     .btn {
-      display:block;
-      width:100%;
-      padding: 1.5rem; /*1.5*48=72px*/
+      display: block;
+      width: 100%;
+      padding: 1.5rem;
       margin: 1rem 0;
       background: transparent;
       color: var(--text-light);
-      font-size: 1rem; /*1*48=48px*/
+      font-size: 1rem;
       text-transform: uppercase;
       border: 0.083rem solid var(--accent);
       border-radius: 0.5rem;
@@ -81,7 +86,7 @@
 </head>
 <body>
   <div class="card">
-    <img id="profile-pic" src="" alt="Foto de perfil" style="display:none;">
+    <img id="profile-pic" src="" alt="Foto de perfil">
     <div id="greeting">Olá.</div>
     <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
     <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
@@ -90,13 +95,13 @@
   <script>
     Telegram.WebApp.ready();
     const user = Telegram.WebApp.initDataUnsafe.user || {};
-    // perfil
+    // Foto de perfil
     if (user.photo_url) {
       const pic = document.getElementById('profile-pic');
       pic.src = user.photo_url;
       pic.style.display = 'block';
     }
-    // saudação em português
+    // Saudação em português
     const hour = new Date().getHours();
     let saudacao;
     if (hour < 12) saudacao = 'Bom dia';
