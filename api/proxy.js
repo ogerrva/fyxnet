@@ -1,4 +1,4 @@
-// Vercel Functions usam Node18 e têm fetch global
+// api/proxy.js
 export default async function handler(req, res) {
   const target = req.query.url;
   if (!target) {
@@ -9,25 +9,39 @@ export default async function handler(req, res) {
   try {
     const upstream = await fetch(target, { redirect: 'manual' });
     const contentType = upstream.headers.get('content-type') || '';
-    const text = await upstream.text();
 
-    // Se não for HTML, devolve puro (CSS, JS, imagens…)
+    // Se não for HTML (CSS, JS, imagens…), apenas repassa o binário
     if (!contentType.includes('text/html')) {
+      const buffer = await upstream.arrayBuffer();
       res.setHeader('Content-Type', contentType);
-      res.status(upstream.status).send(text);
+      res.status(upstream.status).end(Buffer.from(buffer));
       return;
     }
 
-    // Injeta <base> para assets e nosso footer+style+script
+    // É HTML: vamos manipulá-lo como texto
+    let html = await upstream.text();
     const origin = new URL(target).origin;
-    let html = text
-      // <head> → adiciona <base>, style e script do footer
-      .replace(
-        /<head([^>]*)>/i,
-        `<head$1>
+
+    // 1) Reescreve todos <link>, <script> e <img> para passarem pelo proxy também
+    html = html.replace(
+      /(<(?:link|script|img)[^>]+(?:href|src)=")([^"]+)(")/gi,
+      (_, prefix, urlPart, suffix) => {
+        // resolve URLs relativas e absolutas em relação à origem
+        const abs = new URL(urlPart, origin).toString();
+        return `${prefix}/api/proxy?url=${encodeURIComponent(abs)}${suffix}`;
+      }
+    );
+
+    // 2) Injeta <base> para tags que eventualmente não foram capturadas,
+    //    e os estilos + script do footer
+    html = html.replace(
+      /<head([^>]*)>/i,
+      `<head$1>
   <base href="${origin}">
   <style>
-    #__wrapper { padding-bottom: 56px!important; }
+    /* empurra o conteúdo acima do footer */
+    #__wrapper { padding-bottom: 56px !important; }
+    /* estilos do footer */
     #__myFooter {
       position: fixed; bottom: 0; left: 0;
       width: 100%; height: 56px;
@@ -48,12 +62,11 @@ export default async function handler(req, res) {
     function goBack() { history.back(); }
     function goHome() { window.location.href = '/'; }
   </script>`
-      )
-      // Envolve <body> e injeta o footer antes de </body>
-      .replace(
-        /<body([^>]*)>/i,
-        `<body$1><div id="__wrapper">`
-      )
+    );
+
+    // 3) Envolve TODO o body num wrapper e adiciona o footer
+    html = html
+      .replace(/<body([^>]*)>/i, `<body$1><div id="__wrapper">`)
       .replace(
         /<\/body>/i,
         `</div>
@@ -64,12 +77,14 @@ export default async function handler(req, res) {
 </body>`
       );
 
-    // Remove headers que bloqueiam framing (caso ainda você testasse iframe)
+    // 4) Remove headers que impediriam iframe (caso ainda usasse)
     res.removeHeader('X-Frame-Options');
     res.removeHeader('Content-Security-Policy');
 
+    // 5) Retorna o HTML transformado
     res.setHeader('Content-Type', 'text/html');
     res.status(upstream.status).send(html);
+
   } catch (err) {
     res.status(500).send('Erro no proxy: ' + err.message);
   }
