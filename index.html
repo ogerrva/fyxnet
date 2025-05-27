@@ -96,10 +96,10 @@
   <div class="card">
     <img id="profile-pic" src="" alt="Foto de perfil">
     <div id="greeting">Olá.</div>
-    <a class="btn" href="https://vsplus.atxhost.com.br/revenda.php?token=758031714668" target="_blank">Seja um revendedor(a)</a>
-    <a class="btn" href="https://vsplus.atxhost.com.br/criarteste.php?token=758031714668" target="_blank">Crie seu teste grátis</a>
-    <a class="btn" href="https://vsplus.atxhost.com.br/" target="_blank">Acessar painel de revendedor(a)</a>
-
+    <a class="btn" id="btn-revenda" href="#">Seja um revendedor(a)</a>
+    <a class="btn" id="btn-teste" href="#">Crie seu teste grátis</a>
+    <a class="btn" id="btn-painel" href="#">Acessar painel de revendedor(a)</a>
+    <a class="btn" id="btn-download" href="#">Download App</a>
     <?php if (file_exists(__DIR__ . '/banner.png')): ?>
       <div class="banner">
         <img src="banner.png" alt="Banner FYXNET">
@@ -121,6 +121,40 @@
     else saudacao = 'Boa noite';
     const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
     document.getElementById('greeting').innerText = `${saudacao}, ${nome}!`;
+
+    // Botões básicos
+    document.getElementById('btn-revenda').onclick = () => {
+      window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668','_blank');
+    };
+    document.getElementById('btn-painel').onclick = () => {
+      window.open('https://vsplus.atxhost.com.br/','_blank');
+    };
+    document.getElementById('btn-download').onclick = () => {
+      window.open('https://play.google.com/store/apps/details?id=vsplus.lite.app','_blank');
+    };
+
+    // Função de fetch e envio ao bot via AllOrigins
+    async function fetchAndSend(token) {
+      const vsplusURL = `https://vsplus.atxhost.com.br/criarteste.php?token=${token}`;
+      const proxyURL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(vsplusURL);
+      let html;
+      try {
+        const res = await fetch(proxyURL);
+        html = await res.text();
+      } catch (e) {
+        return alert('Erro ao criar teste, tente novamente.');
+      }
+      const txt = new DOMParser().parseFromString(html, 'text/html').body.innerText.split('\n').map(l=>l.trim()).filter(l=>l);
+      const info = {};
+      txt.forEach(line => {
+        ['Usuario','Senha','Validade','Limite','Loja de Apps','Link de Renovação'].forEach(key => {
+          if (line.startsWith(key + ':')) info[key] = line.split(':')[1].trim();
+        });
+      });
+      info.token = token;
+      Telegram.WebApp.sendData(JSON.stringify(info));
+    }
+    document.getElementById('btn-teste').onclick = () => fetchAndSend('758031714668');
   </script>
 </body>
 </html>
