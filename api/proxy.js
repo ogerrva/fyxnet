@@ -10,19 +10,19 @@ export default async function handler(req, res) {
     const upstream = await fetch(target, { redirect: 'manual' });
     const contentType = upstream.headers.get('content-type') || '';
 
-    // Se não for HTML, faz proxy direto (CSS, JS, imagens…)
+    // Se não for HTML, repassa direto (CSS, JS, imagens…)
     if (!contentType.includes('text/html')) {
-      const buffer = await upstream.arrayBuffer();
+      const buf = await upstream.arrayBuffer();
       res.setHeader('Content-Type', contentType);
-      res.status(upstream.status).end(Buffer.from(buffer));
+      res.status(upstream.status).end(Buffer.from(buf));
       return;
     }
 
-    // É HTML: vamos injetar o wrapper, footer e reescrever assets
+    // HTML: injeta <base> e footer, e reescreve assets para passar pelo proxy
     let html = await upstream.text();
     const origin = new URL(target).origin;
 
-    // 1) Reescrever todos os <link>, <script> e <img> para passarem por aqui
+    // 1) Reescrever CSS/JS/imgs para caírem aqui também
     html = html.replace(
       /(<(?:link|script|img)[^>]+(?:href|src)=["'])([^"']+)(["'])/gi,
       (_, pre, urlPart, suf) => {
@@ -31,66 +31,51 @@ export default async function handler(req, res) {
       }
     );
 
-    // 2) Injeção no <head>: <base>, estilo do footer e compatibilidade
+    // 2) Injetar <base>, estilos do footer e funções
     html = html.replace(
       /<head([^>]*)>/i,
       `<head$1>
   <base href="${origin}">
   <style>
-    /* empurra conteúdo acima do footer */
-    #__wrapper { padding-bottom: 56px !important; }
-    /* estilos do footer */
-    #__myFooter {
-      position: fixed;
-      bottom: 0; left: 0;
-      width: 100%; height: 56px;
-      background: #1e293b;
-      border-top: 1px solid #374151;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-      z-index: 9999;
+    #__wrapper{padding-bottom:56px!important;}
+    #__myFooter{
+      position:fixed;bottom:0;left:0;
+      width:100%;height:56px;
+      background:#1e293b;border-top:1px solid #374151;
+      display:flex;justify-content:center;align-items:center;
+      gap:1rem;z-index:9999;
     }
-    #__myFooter a {
-      text-decoration: none;
+    #__myFooter button{
+      background:#6ee7b7;border:none;padding:.5rem 1rem;
+      border-radius:4px;cursor:pointer;font-weight:bold;
     }
-    #__myFooter button {
-      background: #6ee7b7;
-      border: none;
-      padding: .5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #__myFooter button:hover {
-      background: #10b981;
-      color: #fff;
-    }
-  </style>`
+    #__myFooter button:hover{background:#10b981;color:#fff;}
+  </style>
+  <script>
+    function goBack(){history.back()}
+    function goHome(){window.location.href='/'}
+  </script>`
     );
 
-    // 3) Envolver o <body> em um wrapper e injetar o footer como <a> links
+    // 3) Envolver <body> e injetar o footer
     html = html
       .replace(/<body([^>]*)>/i, `<body$1><div id="__wrapper">`)
       .replace(
         /<\/body>/i,
         `</div>
   <div id="__myFooter">
-    <a href="javascript:history.back()"><button>Voltar</button></a>
-    <a href="/"><button>Home</button></a>
+    <button onclick="goBack()">Voltar</button>
+    <button onclick="goHome()">Home</button>
   </div>
 </body>`
       );
 
-    // 4) Remover cabeçalhos de frame-block (caso ainda houvesse iframe)
+    // 4) Remover cabeçalhos de frame-block (segurança)
     res.removeHeader('X-Frame-Options');
     res.removeHeader('Content-Security-Policy');
 
-    // 5) Enviar o HTML transformado
     res.setHeader('Content-Type', 'text/html');
     res.status(upstream.status).send(html);
-
   } catch (err) {
     res.status(500).send('Erro no proxy: ' + err.message);
   }
