@@ -110,25 +110,11 @@
       width: calc(var(--profile-size) * 1rem);
       height: calc(var(--profile-size) * 1rem);
       border-radius: 50%;
-      /* Borda inicial. A animação de pulso será adicionada via classe. */
       border: 0.1rem solid var(--accent);
       object-fit: cover;
       margin: 0 auto 1rem;
-      display: none; /* Escondido por padrão */
-      opacity: 0; /* Para a animação de entrada */
-      transform: translateY(20px); /* Para a animação de entrada */
-    }
-
-    /* Keyframes para a imagem de perfil surgir de baixo para cima */
-    @keyframes slideInFromBottom {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      display: none; /* Escondido por padrão, exibido via JS */
+      /* A animação de pulso será aplicada via JS diretamente no estilo ou classe */
     }
 
     /* Keyframes para a borda da imagem de perfil pulsar */
@@ -144,25 +130,16 @@
       }
     }
 
-    /* Classe para aplicar as animações da imagem de perfil (slide-up e pulso) */
-    .profile-pic-animated {
-      display: block !important; /* Sobrescreve 'display: none' para tornar visível */
-      /* A animação de slide-up dura 0.8s */
-      animation: slideInFromBottom 0.8s ease-out forwards,
-                 /* A animação de pulso começa após o slide-up (0.8s de delay) */
-                 borderPulse 2s infinite alternate ease-in-out 0.8s;
-    }
-
     #greeting {
       font-size: 1rem;
       margin-bottom: 1.5rem;
       text-transform: uppercase;
       letter-spacing: 0.05rem;
-      /* Opcional: Adicionar um cursor que pisca para o efeito de digitação */
-      border-right: 0.15em solid var(--accent); /* Cria o "cursor" */
-      white-space: nowrap; /* Impede quebra de linha durante a digitação */
-      overflow: hidden; /* Esconde o texto que ainda não foi digitado */
-      /* Animação do cursor piscando */
+      /* Cursor que pisca para o efeito de digitação */
+      border-right: 0.15em solid var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      /* Animação do cursor piscando (ativada após a digitação) */
       animation: blink-caret 0.75s step-end infinite;
     }
 
@@ -195,9 +172,9 @@
     }
     /* Efeito de brilho ao tocar/clicar (para celular e mouse) */
     .btn:active {
-      background: var(--btn-bg-hover); /* Mantém o fundo */
-      color: var(--accent); /* Mantém a cor */
-      box-shadow: 0 0 15px var(--accent); /* Adiciona o brilho ao ser ativado */
+      background: var(--btn-bg-hover);
+      color: var(--accent);
+      box-shadow: 0 0 15px var(--accent);
     }
 
     .copy-alert {
@@ -214,9 +191,31 @@
       transition: opacity 0.3s;
       pointer-events: none;
     }
+
     .banner {
       margin-top: 1.5rem;
+      opacity: 0; /* Começa invisível para a animação de entrada */
+      transform: translateY(20px); /* Começa ligeiramente abaixo para a animação de entrada */
+      /* Será exibido e animado via JS */
     }
+
+    /* Keyframes para a animação de surgir de baixo para cima (agora para o banner) */
+    @keyframes slideInFromBottom {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Classe para aplicar a animação de slide-up ao banner */
+    .banner-slide-up {
+      animation: slideInFromBottom 0.8s ease-out forwards;
+    }
+
     .banner img {
       width: 100%;
       border-radius: 0.5rem;
@@ -247,7 +246,7 @@
     Telegram.WebApp.ready(() => {
       const user = Telegram.WebApp.initDataUnsafe.user || {};
 
-      // 1. Efeito de digitação para a saudação
+      // Efeito de digitação para a saudação
       const greetingEl = document.getElementById('greeting');
       const hour = new Date().getHours();
       const saudacao = hour < 12 ? 'Bom dia'
@@ -256,12 +255,11 @@
       const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
       const fullGreetingText = `${saudacao}, ${nome}!`;
 
-      greetingEl.innerText = ''; // Limpa o conteúdo inicial
+      greetingEl.innerText = '';
       let i = 0;
-      const typingSpeed = 70; // Velocidade da digitação (ms por caractere)
+      const typingSpeed = 70;
 
-      // Remove a animação de cursor enquanto digita e a adiciona de volta no final
-      greetingEl.style.animation = 'none';
+      greetingEl.style.animation = 'none'; // Desabilita o cursor enquanto digita
 
       function typeWriter() {
         if (i < fullGreetingText.length) {
@@ -269,23 +267,29 @@
           i++;
           setTimeout(typeWriter, typingSpeed);
         } else {
-          // Quando a digitação terminar, adiciona a animação do cursor novamente
-          greetingEl.style.animation = 'blink-caret 0.75s step-end infinite';
+          greetingEl.style.animation = 'blink-caret 0.75s step-end infinite'; // Habilita o cursor
         }
       }
-      typeWriter(); // Inicia a animação de digitação
+      typeWriter(); // Inicia a digitação
 
-      // 2. Animação da imagem de perfil e 3. Borda pulsante
+      // Imagem de perfil (apenas borda pulsando)
       if (user.photo_url) {
         const pic = document.getElementById('profile-pic');
         pic.src = user.photo_url;
-        // Adiciona a classe para acionar as animações CSS de slide-up e pulso
-        pic.classList.add('profile-pic-animated'); 
+        pic.style.display = 'block'; // Torna a imagem visível
+        // Adiciona a animação de pulso diretamente
+        pic.style.animation = 'borderPulse 2s infinite alternate ease-in-out 0.5s'; // Começa com um pequeno delay
       }
 
-      // Banner opcional
+      // Banner surgindo de baixo para cima
+      const bannerEl = document.getElementById('banner');
       fetch('banner.png', { method: 'HEAD' })
-        .then(res => { if (res.ok) document.getElementById('banner').style.display = 'block'; })
+        .then(res => {
+          if (res.ok) {
+            bannerEl.style.display = 'block'; // Torna o banner visível
+            bannerEl.classList.add('banner-slide-up'); // Adiciona a classe para a animação
+          }
+        })
         .catch(() => {});
 
       // Botões principais
@@ -302,7 +306,7 @@
         window.open('https://vsplus.atxhost.com.br/', '_blank');
       });
 
-      // Download App: openLink + long-press copy (works full button)
+      // Download App: openLink + long-press copy
       const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
       const btnDownload = document.getElementById('btn-download');
       const alertEl = document.getElementById('copy-alert');
