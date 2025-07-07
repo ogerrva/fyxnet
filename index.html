@@ -56,7 +56,7 @@
       100% { background-position: 100% 100%; }
     }
 
-    /* Partículas Flutuantes (agora mais densas e visíveis) */
+    /* Partículas Flutuantes (mais densas e visíveis) */
     body::before {
       content: '';
       position: fixed;
@@ -110,17 +110,68 @@
       width: calc(var(--profile-size) * 1rem);
       height: calc(var(--profile-size) * 1rem);
       border-radius: 50%;
+      /* Borda inicial. A animação de pulso será adicionada via classe. */
       border: 0.1rem solid var(--accent);
       object-fit: cover;
       margin: 0 auto 1rem;
-      display: none;
+      display: none; /* Escondido por padrão */
+      opacity: 0; /* Para a animação de entrada */
+      transform: translateY(20px); /* Para a animação de entrada */
     }
+
+    /* Keyframes para a imagem de perfil surgir de baixo para cima */
+    @keyframes slideInFromBottom {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Keyframes para a borda da imagem de perfil pulsar */
+    @keyframes borderPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(78,231,183,0.4); /* Brilho inicial mais sutil */
+      }
+      50% {
+        box-shadow: 0 0 10px 5px rgba(78,231,183,0.7); /* Brilho mais proeminente */
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(78,231,183,0.4);
+      }
+    }
+
+    /* Classe para aplicar as animações da imagem de perfil (slide-up e pulso) */
+    .profile-pic-animated {
+      display: block !important; /* Sobrescreve 'display: none' para tornar visível */
+      /* A animação de slide-up dura 0.8s */
+      animation: slideInFromBottom 0.8s ease-out forwards,
+                 /* A animação de pulso começa após o slide-up (0.8s de delay) */
+                 borderPulse 2s infinite alternate ease-in-out 0.8s;
+    }
+
     #greeting {
       font-size: 1rem;
       margin-bottom: 1.5rem;
       text-transform: uppercase;
       letter-spacing: 0.05rem;
+      /* Opcional: Adicionar um cursor que pisca para o efeito de digitação */
+      border-right: 0.15em solid var(--accent); /* Cria o "cursor" */
+      white-space: nowrap; /* Impede quebra de linha durante a digitação */
+      overflow: hidden; /* Esconde o texto que ainda não foi digitado */
+      /* Animação do cursor piscando */
+      animation: blink-caret 0.75s step-end infinite;
     }
+
+    /* Keyframes para o cursor piscando */
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: var(--accent); }
+    }
+
     .btn {
       display: block;
       width: 100%;
@@ -180,7 +231,6 @@
 
     <a class="btn" id="btn-revenda">Seja um revendedor(a)</a>
     <a class="btn" id="btn-teste">Crie seu teste grátis</a>
-    <!-- Botão "RENOVAR USUARIO" - Adicionado conforme sua solicitação inicial -->
     <a class="btn" id="btn-renovar">RENOVAR USUARIO</a> 
     <a class="btn" id="btn-painel">Acessar painel de revendedor(a)</a>
     <a class="btn" id="btn-download">
@@ -194,69 +244,92 @@
   </div>
 
   <script>
-    Telegram.WebApp.ready();
+    Telegram.WebApp.ready(() => {
+      const user = Telegram.WebApp.initDataUnsafe.user || {};
 
-    // Saudação e perfil
-    const user = Telegram.WebApp.initDataUnsafe.user || {};
-    if (user.photo_url) {
-      const pic = document.getElementById('profile-pic');
-      pic.src = user.photo_url;
-      pic.style.display = 'block';
-    }
-    const hour = new Date().getHours();
-    const saudacao = hour < 12 ? 'Bom dia'
-                    : hour < 18 ? 'Boa tarde'
-                    : 'Boa noite';
-    const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
-    document.getElementById('greeting').innerText = `${saudacao}, ${nome}!`;
+      // 1. Efeito de digitação para a saudação
+      const greetingEl = document.getElementById('greeting');
+      const hour = new Date().getHours();
+      const saudacao = hour < 12 ? 'Bom dia'
+                      : hour < 18 ? 'Boa tarde'
+                      : 'Boa noite';
+      const nome = user.first_name ? user.first_name.toUpperCase() : 'FYXNET';
+      const fullGreetingText = `${saudacao}, ${nome}!`;
 
-    // Banner opcional
-    fetch('banner.png', { method: 'HEAD' })
-      .then(res => { if (res.ok) document.getElementById('banner').style.display = 'block'; })
-      .catch(() => {});
+      greetingEl.innerText = ''; // Limpa o conteúdo inicial
+      let i = 0;
+      const typingSpeed = 70; // Velocidade da digitação (ms por caractere)
 
-    // Botões principais
-    document.getElementById('btn-revenda').addEventListener('click', () => {
-      window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668', '_blank');
-    });
-    document.getElementById('btn-teste').addEventListener('click', () => {
-      window.open('https://vsplus.atxhost.com.br/criarteste.php?token=758031714668', '_blank');
-    });
-    document.getElementById('btn-renovar').addEventListener('click', () => {
-      window.open('https://vsplus.atxhost.com.br/renovar.php', '_blank');
-    });
-    document.getElementById('btn-painel').addEventListener('click', () => {
-      window.open('https://vsplus.atxhost.com.br/', '_blank');
-    });
+      // Remove a animação de cursor enquanto digita e a adiciona de volta no final
+      greetingEl.style.animation = 'none';
 
-    // Download App: openLink + long-press copy (works full button)
-    const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
-    const btnDownload = document.getElementById('btn-download');
-    const alertEl = document.getElementById('copy-alert');
-    let pressTimer;
+      function typeWriter() {
+        if (i < fullGreetingText.length) {
+          greetingEl.innerText += fullGreetingText.charAt(i);
+          i++;
+          setTimeout(typeWriter, typingSpeed);
+        } else {
+          // Quando a digitação terminar, adiciona a animação do cursor novamente
+          greetingEl.style.animation = 'blink-caret 0.75s step-end infinite';
+        }
+      }
+      typeWriter(); // Inicia a animação de digitação
 
-    function showCopyAlert() {
-      alertEl.style.opacity = 1;
-      setTimeout(() => alertEl.style.opacity = 0, 1500);
-    }
+      // 2. Animação da imagem de perfil e 3. Borda pulsante
+      if (user.photo_url) {
+        const pic = document.getElementById('profile-pic');
+        pic.src = user.photo_url;
+        // Adiciona a classe para acionar as animações CSS de slide-up e pulso
+        pic.classList.add('profile-pic-animated'); 
+      }
 
-    ['mousedown','pointerdown','touchstart'].forEach(evt =>
-      btnDownload.addEventListener(evt, () => {
-        pressTimer = setTimeout(() => {
-          navigator.clipboard.writeText(downloadLink);
-          showCopyAlert();
-        }, 700);
-      })
-    );
-    ['mouseup','pointerup','mouseleave','touchend','touchcancel'].forEach(evt =>
-      btnDownload.addEventListener(evt, () => clearTimeout(pressTimer))
-    );
+      // Banner opcional
+      fetch('banner.png', { method: 'HEAD' })
+        .then(res => { if (res.ok) document.getElementById('banner').style.display = 'block'; })
+        .catch(() => {});
 
-    btnDownload.addEventListener('click', () => {
-      // Prioriza a função nativa do Telegram Web App para abrir links
-      Telegram.WebApp.openLink
-        ? Telegram.WebApp.openLink(downloadLink)
-        : window.open(downloadLink, '_blank'); // Fallback para navegadores comuns
+      // Botões principais
+      document.getElementById('btn-revenda').addEventListener('click', () => {
+        window.open('https://vsplus.atxhost.com.br/revenda.php?token=758031714668', '_blank');
+      });
+      document.getElementById('btn-teste').addEventListener('click', () => {
+        window.open('https://vsplus.atxhost.com.br/criarteste.php?token=758031714668', '_blank');
+      });
+      document.getElementById('btn-renovar').addEventListener('click', () => {
+        window.open('https://vsplus.atxhost.com.br/renovar.php', '_blank');
+      });
+      document.getElementById('btn-painel').addEventListener('click', () => {
+        window.open('https://vsplus.atxhost.com.br/', '_blank');
+      });
+
+      // Download App: openLink + long-press copy (works full button)
+      const downloadLink = 'https://play.google.com/store/apps/details?id=vsplus.lite.app';
+      const btnDownload = document.getElementById('btn-download');
+      const alertEl = document.getElementById('copy-alert');
+      let pressTimer;
+
+      function showCopyAlert() {
+        alertEl.style.opacity = 1;
+        setTimeout(() => alertEl.style.opacity = 0, 1500);
+      }
+
+      ['mousedown','pointerdown','touchstart'].forEach(evt =>
+        btnDownload.addEventListener(evt, () => {
+          pressTimer = setTimeout(() => {
+            navigator.clipboard.writeText(downloadLink);
+            showCopyAlert();
+          }, 700);
+        })
+      );
+      ['mouseup','pointerup','mouseleave','touchend','touchcancel'].forEach(evt =>
+        btnDownload.addEventListener(evt, () => clearTimeout(pressTimer))
+      );
+
+      btnDownload.addEventListener('click', () => {
+        Telegram.WebApp.openLink
+          ? Telegram.WebApp.openLink(downloadLink)
+          : window.open(downloadLink, '_blank');
+      });
     });
   </script>
 </body>
