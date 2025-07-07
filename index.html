@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-M">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <title>FYXNET</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -43,8 +43,8 @@
       font-family: 'CustomFont', sans-serif;
       /* Animação do gradiente de fundo mais visível */
       background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
-      background-size: 400% 400%; /* Gradiente maior para um movimento mais evidente */
-      animation: gradientShift 25s ease infinite alternate; /* Animação mais perceptível */
+      background-size: 400% 400%;
+      animation: gradientShift 25s ease infinite alternate;
       color: var(--text-light);
       overflow: hidden;
       position: relative;
@@ -74,14 +74,14 @@
                   radial-gradient(circle at 25% 45%, rgba(255,255,255,0.05) 1px, transparent 1px);
       /* Tamanhos correspondentes para criar a densidade e o movimento */
       background-size: 150px 150px, 200px 200px, 100px 100px, 180px 180px, 120px 120px, 170px 170px, 130px 130px;
-      animation: moveParticles 40s linear infinite; /* Animação de movimento das partículas */
+      animation: moveParticles 40s linear infinite;
       z-index: -1;
     }
 
     /* Keyframes para a animação das partículas */
     @keyframes moveParticles {
       0% { background-position: 0 0; }
-      100% { background-position: 500px 500px; } /* Movimento maior para ser mais visível */
+      100% { background-position: 500px 500px; }
     }
 
     .card {
@@ -113,17 +113,16 @@
       border: 0.1rem solid var(--accent);
       object-fit: cover;
       margin: 0 auto 1rem;
-      display: none; /* Escondido por padrão, exibido via JS */
-      /* A animação de pulso será aplicada via JS diretamente no estilo ou classe */
+      display: none; /* Oculta a imagem de perfil por padrão, JS irá exibir */
     }
 
     /* Keyframes para a borda da imagem de perfil pulsar */
     @keyframes borderPulse {
       0% {
-        box-shadow: 0 0 0 0 rgba(78,231,183,0.4); /* Brilho inicial mais sutil */
+        box-shadow: 0 0 0 0 rgba(78,231,183,0.4);
       }
       50% {
-        box-shadow: 0 0 10px 5px rgba(78,231,183,0.7); /* Brilho mais proeminente */
+        box-shadow: 0 0 10px 5px rgba(78,231,183,0.7);
       }
       100% {
         box-shadow: 0 0 0 0 rgba(78,231,183,0.4);
@@ -139,8 +138,7 @@
       border-right: 0.15em solid var(--accent);
       white-space: nowrap;
       overflow: hidden;
-      /* Animação do cursor piscando (ativada após a digitação) */
-      animation: blink-caret 0.75s step-end infinite;
+      animation: blink-caret 0.75s step-end infinite; /* Ativada após a digitação */
     }
 
     /* Keyframes para o cursor piscando */
@@ -161,16 +159,13 @@
       border: 0.1rem solid var(--accent);
       border-radius: 0.5rem;
       text-decoration: none;
-      /* Transição para background, cor e sombra (brilho) */
-      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s; 
+      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
       position: relative;
     }
-    /* Efeito de hover para mouse (mantido) */
     .btn:hover {
       background: var(--btn-bg-hover);
       color: var(--accent);
     }
-    /* Efeito de brilho ao tocar/clicar (para celular e mouse) */
     .btn:active {
       background: var(--btn-bg-hover);
       color: var(--accent);
@@ -194,12 +189,12 @@
 
     .banner {
       margin-top: 1.5rem;
-      opacity: 0; /* Começa invisível para a animação de entrada */
-      transform: translateY(20px); /* Começa ligeiramente abaixo para a animação de entrada */
-      /* Será exibido e animado via JS */
+      display: none; /* Oculta o banner por padrão, JS irá exibir */
+      opacity: 0; /* Para a animação de entrada */
+      transform: translateY(20px); /* Para a animação de entrada */
     }
 
-    /* Keyframes para a animação de surgir de baixo para cima (agora para o banner) */
+    /* Keyframes para a animação de surgir de baixo para cima (para o banner) */
     @keyframes slideInFromBottom {
       from {
         opacity: 0;
@@ -237,7 +232,7 @@
       <div class="copy-alert" id="copy-alert">Link copiado!</div>
     </a>
 
-    <div class="banner" id="banner" style="display:none;">
+    <div class="banner" id="banner">
       <img src="banner.png" alt="Banner FYXNET">
     </div>
   </div>
@@ -273,12 +268,14 @@
       typeWriter(); // Inicia a digitação
 
       // Imagem de perfil (apenas borda pulsando)
+      const pic = document.getElementById('profile-pic');
       if (user.photo_url) {
-        const pic = document.getElementById('profile-pic');
         pic.src = user.photo_url;
         pic.style.display = 'block'; // Torna a imagem visível
         // Adiciona a animação de pulso diretamente
         pic.style.animation = 'borderPulse 2s infinite alternate ease-in-out 0.5s'; // Começa com um pequeno delay
+      } else {
+        pic.style.display = 'none'; // Garante que fique oculto se não houver foto
       }
 
       // Banner surgindo de baixo para cima
@@ -290,7 +287,10 @@
             bannerEl.classList.add('banner-slide-up'); // Adiciona a classe para a animação
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          // Se o banner.png não for encontrado, garantimos que o banner div não apareça
+          bannerEl.style.display = 'none';
+        });
 
       // Botões principais
       document.getElementById('btn-revenda').addEventListener('click', () => {
