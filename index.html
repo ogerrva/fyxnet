@@ -14,12 +14,12 @@
       --base-font-size: 16px;
       --scale: 1.5;
       --profile-size: 4;
-      --gradient-from: #1f004a; /* Cor inicial do gradiente de fundo */
-      --gradient-to:   #09001c; /* Cor final do gradiente de fundo */
-      --accent:        #4ee7b7; /* Cor de destaque (botões, bordas) */
-      --text-light:    #e0ffff; /* Cor do texto claro */
-      --btn-bg-hover:  rgba(78,231,183,0.1); /* Cor de fundo do botão ao passar o mouse (com transparência) */
-      --card-bg:       linear-gradient(135deg, var(--gradient-to), var(--gradient-from)); /* Fundo do cartão */
+      --gradient-from: #1f004a;
+      --gradient-to:   #09001c;
+      --accent:        #4ee7b7;
+      --text-light:    #e0ffff;
+      --btn-bg-hover:  rgba(78,231,183,0.1);
+      --card-bg:       linear-gradient(135deg, var(--gradient-to), var(--gradient-from));
     }
     html {
       font-size: calc(var(--base-font-size) * var(--scale));
@@ -41,45 +41,47 @@
       align-items: center;
       justify-content: center;
       font-family: 'CustomFont', sans-serif;
-      /* Animação do gradiente de fundo */
+      /* Animação do gradiente de fundo mais visível */
       background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
-      background-size: 200% 200%; /* Torna o gradiente maior para animação */
-      animation: gradientShift 15s ease infinite alternate; /* Aplica a animação ao gradiente */
+      background-size: 400% 400%; /* Gradiente maior para um movimento mais evidente */
+      animation: gradientShift 25s ease infinite alternate; /* Animação mais perceptível */
       color: var(--text-light);
-      overflow: hidden; /* Evita barras de rolagem desnecessárias */
-      position: relative; /* Necessário para posicionar o pseudo-elemento das partículas */
+      overflow: hidden;
+      position: relative;
     }
 
-    /* Keyframes para a animação do gradiente de fundo */
+    /* Keyframes para a animação do gradiente */
     @keyframes gradientShift {
-      0% { background-position: 0% 0%; } /* Posição inicial */
-      100% { background-position: 100% 100%; } /* Posição final (cria o movimento) */
+      0% { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
     }
 
-    /* Partículas Flutuantes (usando pseudo-elemento ::before no body) */
+    /* Partículas Flutuantes (agora mais densas e visíveis) */
     body::before {
-      content: ''; /* Essencial para pseudo-elementos */
-      position: fixed; /* Fixa o elemento na tela */
+      content: '';
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      /* Múltiplos gradientes radiais para criar diferentes pontos/partículas */
+      /* Múltiplos gradientes para mais partículas e tamanhos variados */
       background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.05) 1px, transparent 1px),
                   radial-gradient(circle at 70% 30%, rgba(255,255,255,0.05) 1px, transparent 1px),
                   radial-gradient(circle at 40% 60%, rgba(255,255,255,0.05) 1px, transparent 1px),
                   radial-gradient(circle at 90% 10%, rgba(255,255,255,0.05) 1px, transparent 1px),
-                  radial-gradient(circle at 10% 50%, rgba(255,255,255,0.05) 1px, transparent 1px);
-      /* Tamanhos correspondentes para os gradientes (diferentes "estrelas") */
-      background-size: 150px 150px, 200px 200px, 100px 100px, 180px 180px, 120px 120px;
+                  radial-gradient(circle at 10% 50%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                  radial-gradient(circle at 55% 20%, rgba(255,255,255,0.05) 1px, transparent 1px),
+                  radial-gradient(circle at 25% 45%, rgba(255,255,255,0.05) 1px, transparent 1px);
+      /* Tamanhos correspondentes para criar a densidade e o movimento */
+      background-size: 150px 150px, 200px 200px, 100px 100px, 180px 180px, 120px 120px, 170px 170px, 130px 130px;
       animation: moveParticles 40s linear infinite; /* Animação de movimento das partículas */
-      z-index: -1; /* Garante que as partículas fiquem atrás do conteúdo principal */
+      z-index: -1;
     }
 
     /* Keyframes para a animação das partículas */
     @keyframes moveParticles {
-      0% { background-position: 0 0; } /* Posição inicial */
-      100% { background-position: 500px 500px; } /* Deslocamento para criar a ilusão de movimento */
+      0% { background-position: 0 0; }
+      100% { background-position: 500px 500px; } /* Movimento maior para ser mais visível */
     }
 
     .card {
@@ -92,10 +94,10 @@
       box-shadow: 0 1rem 3rem rgba(0,0,0,0.4);
       overflow: hidden;
       position: relative;
-      /* Animação de entrada do cartão ao carregar a página */
-      opacity: 0; /* Começa invisível */
-      transform: translateY(20px); /* Começa ligeiramente abaixo */
-      animation: fadeInSlideUp 0.8s ease-out forwards; /* Animação de fade-in e slide para cima */
+      /* Animação de entrada do cartão */
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInSlideUp 0.8s ease-out forwards;
     }
 
     /* Keyframes para a animação de entrada do cartão */
@@ -111,7 +113,7 @@
       border: 0.1rem solid var(--accent);
       object-fit: cover;
       margin: 0 auto 1rem;
-      display: none; /* Escondido por padrão, mostrado via JS se houver foto */
+      display: none;
     }
     #greeting {
       font-size: 1rem;
@@ -131,15 +133,22 @@
       border: 0.1rem solid var(--accent);
       border-radius: 0.5rem;
       text-decoration: none;
-      /* Adicionado box-shadow na transição para o efeito de brilho */
-      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+      /* Transição para background, cor e sombra (brilho) */
+      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s; 
       position: relative;
     }
+    /* Efeito de hover para mouse (mantido) */
     .btn:hover {
       background: var(--btn-bg-hover);
       color: var(--accent);
-      box-shadow: 0 0 15px var(--accent); /* Efeito de brilho ao passar o mouse */
     }
+    /* Efeito de brilho ao tocar/clicar (para celular e mouse) */
+    .btn:active {
+      background: var(--btn-bg-hover); /* Mantém o fundo */
+      color: var(--accent); /* Mantém a cor */
+      box-shadow: 0 0 15px var(--accent); /* Adiciona o brilho ao ser ativado */
+    }
+
     .copy-alert {
       position: absolute;
       bottom: -1.5rem;
@@ -171,7 +180,7 @@
 
     <a class="btn" id="btn-revenda">Seja um revendedor(a)</a>
     <a class="btn" id="btn-teste">Crie seu teste grátis</a>
-    <!-- Botão "RENOVAR USUARIO" - Adicionado conforme sua solicitação anterior -->
+    <!-- Botão "RENOVAR USUARIO" - Adicionado conforme sua solicitação inicial -->
     <a class="btn" id="btn-renovar">RENOVAR USUARIO</a> 
     <a class="btn" id="btn-painel">Acessar painel de revendedor(a)</a>
     <a class="btn" id="btn-download">
@@ -213,7 +222,6 @@
     document.getElementById('btn-teste').addEventListener('click', () => {
       window.open('https://vsplus.atxhost.com.br/criarteste.php?token=758031714668', '_blank');
     });
-    // Adicionando o evento para o novo botão RENOVAR USUARIO
     document.getElementById('btn-renovar').addEventListener('click', () => {
       window.open('https://vsplus.atxhost.com.br/renovar.php', '_blank');
     });
@@ -245,9 +253,10 @@
     );
 
     btnDownload.addEventListener('click', () => {
+      // Prioriza a função nativa do Telegram Web App para abrir links
       Telegram.WebApp.openLink
         ? Telegram.WebApp.openLink(downloadLink)
-        : window.open(downloadLink, '_blank');
+        : window.open(downloadLink, '_blank'); // Fallback para navegadores comuns
     });
   </script>
 </body>
